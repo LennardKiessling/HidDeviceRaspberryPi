@@ -250,10 +250,15 @@ def execute_command(command):
             time.sleep(random.uniform(0, 0.25))
         else:
             send_input_mouse(commands[command])
-            time.sleep(0.01)
             send_input_mouse(b'\x00\x00\x00\x00')
     else:
         print(f"Unknown command: {command}")
+
+# Do not use with normal commands (no check for errors)
+def move_mouse_fast(command):
+    send_input_mouse(commands[command])
+    send_input_mouse(b'\x00\x00\x00\x00')
+
 
 def type_word(word):
     for char in word:
@@ -271,30 +276,30 @@ sqrt3 = np.sqrt(3)
 sqrt5 = np.sqrt(5)
 
 def move_left():
-    execute_command("move_left")
+    move_mouse_fast("move_left")
 
 def move_right():
-    execute_command("move_right")
+    move_mouse_fast("move_right")
 
 def move_up():
-    execute_command("move_up")
+    move_mouse_fast("move_up")
 
 def move_down():
-    execute_command("move_down")
+    move_mouse_fast("move_down")
 
 def move_up_right():
-    execute_command("move_right_up")
+    move_mouse_fast("move_right_up")
 
 def move_up_left():
-    execute_command("move_left_up")
+    move_mouse_fast("move_left_up")
 
 def move_down_right():
-    execute_command("move_right_down")
+    move_mouse_fast("move_right_down")
 
 def move_down_left():
-    execute_command("move_left_down")
+    move_mouse_fast("move_left_down")
 
-def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=50, D_0=12, tolerance=1, move_mouse=lambda x, y: None):
+def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=15, D_0=12, tolerance=1, move_mouse=lambda x, y: None):
     '''
     WindMouse algorithm. Calls the move_mouse kwarg with each new step.
     Released under the terms of the GPLv3 license.
@@ -304,6 +309,8 @@ def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=50, D_0=12, t
     D_0 - distance where wind behavior changes from random to damped
     tolerance - tolerance radius for the destination
     '''
+    dest_x = dest_x * 1.758 # Multiplier for 1920x1080
+    dest_y = dest_y * 1.758 # same here
     current_x, current_y = start_x, start_y
     v_x = v_y = W_x = W_y = 0
     positions = [(current_x, current_y)]
@@ -386,6 +393,10 @@ execute_command("key_backslash")
 type_word("Documents")
 execute_command("key_backslash")
 execute_command("key_enter")
-wind_mouse(0,0,0,1080)
+wind_mouse(0,0,-1920,-1080)
+wind_mouse(0,0,960,540)
+wind_mouse(0,0,-350,-190)
 execute_command("left_click")
 execute_command("left_click")
+
+
