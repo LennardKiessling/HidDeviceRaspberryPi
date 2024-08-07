@@ -6,12 +6,12 @@ def send_input(report, device):
         fd.write(report)
 
 def send_input_keyboard(report):
-    print(report)
-    #send_input(report, "/dev/hidg0")
+    #print(report)
+    send_input(report, "/dev/hidg0")
 
 def send_input_mouse(report):
-    print(report)
-    #send_input(report, "/dev/hidg1")
+    #print(report)
+    send_input(report, "/dev/hidg1")
 
 # Define the HID reports for keyboard and mouse actions
 commands = {
@@ -87,19 +87,34 @@ commands = {
     "key_enter": b'\x00\x00\x28\x00\x00\x00\x00\x00',
     "key_esc": b'\x00\x00\x29\x00\x00\x00\x00\x00',
     "key_backspace": b'\x00\x00\x2a\x00\x00\x00\x00\x00',
+    "key_backslash": b'\x40\x00\x2d\x00\x00\x00\x00\x00',  # AltGr + ß
     "key_tab": b'\x00\x00\x2b\x00\x00\x00\x00\x00',
     "key_space": b'\x00\x00\x2c\x00\x00\x00\x00\x00',
-    "key_minus": b'\x00\x00\x2d\x00\x00\x00\x00\x00',
-    "key_equal": b'\x00\x00\x2e\x00\x00\x00\x00\x00',
-    "key_leftbracket": b'\x00\x00\x2f\x00\x00\x00\x00\x00',
-    "key_rightbracket": b'\x00\x00\x30\x00\x00\x00\x00\x00',
-    "key_backslash": b'\x00\x00\x31\x00\x00\x00\x00\x00',
-    "key_semicolon": b'\x00\x00\x33\x00\x00\x00\x00\x00',
-    "key_apostrophe": b'\x00\x00\x34\x00\x00\x00\x00\x00',
-    "key_grave": b'\x00\x00\x35\x00\x00\x00\x00\x00',
-    "key_comma": b'\x00\x00\x36\x00\x00\x00\x00\x00',
-    "key_period": b'\x00\x00\x37\x00\x00\x00\x00\x00',
-    "key_slash": b'\x00\x00\x38\x00\x00\x00\x00\x00',
+
+    # German special characters
+    "key_ss": b'\x00\x00\x2d\x00\x00\x00\x00\x00',  # "ß"
+    "key_question": b'\x02\x00\x2d\x00\x00\x00\x00\x00',  # "?"
+    "key_accent": b'\x00\x00\x2e\x00\x00\x00\x00\x00',  # "´"
+    "key_grave": b'\x02\x00\x2e\x00\x00\x00\x00\x00',  # "`"
+    "key_ue": b'\x00\x00\x2f\x00\x00\x00\x00\x00',  # "ü"
+    "key_Ue": b'\x02\x00\x2f\x00\x00\x00\x00\x00',  # "Ü"
+    "key_plus": b'\x00\x00\x30\x00\x00\x00\x00\x00',  # "+"
+    "key_asterisk": b'\x02\x00\x30\x00\x00\x00\x00\x00',  # "*"
+    "key_hash": b'\x00\x00\x32\x00\x00\x00\x00\x00',  # "#"
+    "key_apostrophe": b'\x02\x00\x32\x00\x00\x00\x00\x00',  # "'"
+    "key_oe": b'\x00\x00\x33\x00\x00\x00\x00\x00',  # "ö"
+    "key_Oe": b'\x02\x00\x33\x00\x00\x00\x00\x00',  # "Ö"
+    "key_ae": b'\x00\x00\x34\x00\x00\x00\x00\x00',  # "ä"
+    "key_Ae": b'\x02\x00\x34\x00\x00\x00\x00\x00',  # "Ä"
+    "key_comma": b'\x00\x00\x36\x00\x00\x00\x00\x00',  # ","
+    "key_semicolon": b'\x02\x00\x36\x00\x00\x00\x00\x00',  # ";"
+    "key_period": b'\x00\x00\x37\x00\x00\x00\x00\x00',  # "."
+    "key_colon": b'\x02\x00\x37\x00\x00\x00\x00\x00',  # ":"
+    "key_minus": b'\x00\x00\x38\x00\x00\x00\x00\x00',  # "-"
+    "key_underscore": b'\x02\x00\x38\x00\x00\x00\x00\x00',  # "_"
+    "key_less_than": b'\x00\x00\x64\x00\x00\x00\x00\x00',  # "<"
+    "key_greater_than": b'\x02\x00\x64\x00\x00\x00\x00\x00',  # ">"
+
     "key_capslock": b'\x00\x00\x39\x00\x00\x00\x00\x00',
     "key_windows": b'\x08\x00\x00\x00\x00\x00\x00\x00',
 
@@ -231,9 +246,8 @@ def execute_command(command):
     if command in commands:
         if "key_" in command:
             send_input_keyboard(commands[command])
-            time.sleep(0.1)
             send_input_keyboard(b'\x00\x00\x00\x00\x00\x00\x00\x00')  # Release all keys
-            time.sleep(random.uniform(0, 0.5))
+            time.sleep(random.uniform(0, 0.25))
         else:
             send_input_mouse(commands[command])
             time.sleep(0.01)
@@ -280,7 +294,7 @@ def move_down_right():
 def move_down_left():
     execute_command("move_left_down")
 
-def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=5, D_0=12, tolerance=1, move_mouse=lambda x, y: None):
+def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=50, D_0=12, tolerance=1, move_mouse=lambda x, y: None):
     '''
     WindMouse algorithm. Calls the move_mouse kwarg with each new step.
     Released under the terms of the GPLv3 license.
@@ -361,11 +375,17 @@ def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=5, D_0=12, to
 # Malware is here:
 # C:\Users\BA-LK\Documents\
 
-
-wind_mouse(0, 0, 520, 0)
 execute_command("key_windows")
 execute_command("key_C")
-execute_command("")
-execute_command("")
-type_word("")
+execute_command("key_colon")
+execute_command("key_backslash")
+type_word("Users")
+execute_command("key_backslash")
+type_word("BA-LK")
+execute_command("key_backslash")
+type_word("Documents")
+execute_command("key_backslash")
 execute_command("key_enter")
+wind_mouse(0,0,0,1080)
+execute_command("left_click")
+execute_command("left_click")
